@@ -1,16 +1,20 @@
 package com.example.dexfold.domain.repository
 
+// YA NO USAMOS LA ENTITY
 import com.example.dexfold.data.local.entity.PokemonEntity
+import com.example.dexfold.domain.model.Pokemon
 
 // 👇 Esta interface vive en domain/ porque es un CONTRATO
 // domain no sabe cómo se implementa, solo qué puede pedir
+// 👇 Este es el CONTRATO
+// domain define QUÉ puede pedir, sin saber CÓMO se implementa
 interface PokemonRepository {
 
-    // 👇 Retorna Result<T> de Kotlin — maneja éxito y error elegantemente
+    // 👇 Ahora retorna modelos limpios, no Entities
     suspend fun getPokemonList(
         limit: Int = 20,
         offset: Int = 0
-    ): Result<List<PokemonEntity>>
+    ): Result<List<Pokemon>>
 
-    suspend fun getPokemonDetail(id: Int): Result<PokemonEntity>
+    suspend fun   getPokemonDetail(id: Int): Result<Pokemon>
 }
