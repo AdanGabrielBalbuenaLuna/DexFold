@@ -4,6 +4,8 @@ import com.example.dexfold.data.local.PokemonDao
 import com.example.dexfold.data.remote.PokemonApiService
 import com.example.dexfold.domain.repository.PokemonRepository
 import com.example.dexfold.data.local.entity.PokemonEntity
+import com.example.dexfold.domain.model.Pokemon
+import com.example.dexfold.domain.mapper.PokemonMapper
 
 // 👇 Implementa el contrato definido en domain/
 class PokemonRepositoryImpl(
@@ -14,7 +16,8 @@ class PokemonRepositoryImpl(
     override suspend fun getPokemonList(
         limit: Int,
         offset: Int
-    ): Result<List<PokemonEntity>> {
+    ): Result<List<Pokemon>> {
+        // Antes: Result<List<PokemonEntity>>  ← Entity cruda de Room // Ahora: Result<List<Pokemon>>  ← modelo limpio de dominio
 
         return try {
             // 👇 Paso 1 — ¿Tenemos datos locales?
@@ -23,7 +26,9 @@ class PokemonRepositoryImpl(
             if (localPokemon.isNotEmpty()) {
                 // 👇 Paso 2a — Sí hay datos, los retornamos
                 // sin llamar a la API
-                Result.success(localPokemon)
+                // antes - > Result.success(localPokemon)
+                // 👇 Ahora mapeamos antes de retornar
+                Result.success(PokemonMapper.fromEntityList(localPokemon))
             } else {
                 // 👇 Paso 2b — No hay datos, llamamos a la API
                 val response = apiService.getPokemonList(limit, offset)
@@ -54,7 +59,9 @@ class PokemonRepositoryImpl(
                 pokemonDao.insertAllPokemon(entities)
 
                 // 👇 Paso 5 — Retornamos los datos
-                Result.success(entities)
+                // antes -> Result.success(entities)
+                // 👇 Mapeamos las entities recién creadas
+                Result.success(PokemonMapper.fromEntityList(entities))
             }
         } catch (e: Exception) {
             // 👇 Cualquier error (red, BD) lo capturamos aquí
@@ -62,14 +69,15 @@ class PokemonRepositoryImpl(
         }
     }
 
-    override suspend fun getPokemonDetail(id: Int): Result<PokemonEntity> {
+    override suspend fun getPokemonDetail(id: Int): Result<Pokemon> {
         return try {
             // 👇 Paso 1 — ¿Tenemos el detalle en local?
             val localPokemon = pokemonDao.getPokemonById(id)
 
             // 👇 Si tiene tipos es que ya tiene el detalle completo
             if (localPokemon != null && localPokemon.types.isNotEmpty()) {
-                Result.success(localPokemon)
+                // antes -> Result.success(localPokemon)
+                Result.success(PokemonMapper.fromEntity(localPokemon))
             } else {
                 // 👇 Paso 2 — Llamamos al detalle en la API
                 val response = apiService.getPokemonDetail(id)
@@ -93,7 +101,9 @@ class PokemonRepositoryImpl(
                 // 👇 Paso 4 — Actualizamos en Room
                 pokemonDao.insertPokemon(entity)
 
-                Result.success(entity)
+                // Antes -> Result.success(entity)
+                // 👇 Mapeamos la entity recién creada
+                Result.success(PokemonMapper.fromEntity(entity))
             }
         } catch (e: Exception) {
             Result.failure(e)
