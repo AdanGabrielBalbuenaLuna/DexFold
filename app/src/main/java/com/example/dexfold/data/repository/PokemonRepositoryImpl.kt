@@ -6,9 +6,10 @@ import com.example.dexfold.domain.repository.PokemonRepository
 import com.example.dexfold.data.local.entity.PokemonEntity
 import com.example.dexfold.domain.model.Pokemon
 import com.example.dexfold.domain.mapper.PokemonMapper
+import javax.inject.Inject
 
 // 👇 Implementa el contrato definido en domain/
-class PokemonRepositoryImpl(
+class PokemonRepositoryImpl @Inject constructor(
     private val apiService: PokemonApiService,
     private val pokemonDao: PokemonDao
 ) : PokemonRepository {
