@@ -2,11 +2,12 @@ package com.example.dexfold.domain.usecase
 
 import com.example.dexfold.domain.model.Pokemon
 import com.example.dexfold.domain.repository.PokemonRepository
+import javax.inject.Inject
 
 // 👇 Recibe el Repository por constructor
 // No sabe si los datos vienen de Room o de Retrofit
 // Solo sabe QUÉ pedir, no CÓMO se obtiene
-class GetPokemonListUseCase(
+class GetPokemonListUseCase @Inject constructor(
     private val repository: PokemonRepository
 ) {
     // 👇 operator fun invoke permite llamar el UseCase como función
