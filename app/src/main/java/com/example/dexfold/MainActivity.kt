@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.example.dexfold.core.util.rememberWindowState
 import com.example.dexfold.ui.navigation.DexFoldNavHost
 import com.example.dexfold.ui.theme.DexFoldTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,12 +24,17 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DexFoldTheme {
+                // 👇 Detectamos el estado del dispositivo
+                val windowState = rememberWindowState(this)
                 val navController = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     // 👇 Por ahora solo esto
                     // En Fase 6 con Hilt agregamos NavController y ViewModels
                     Box(modifier = Modifier.padding(innerPadding)) {
-                        DexFoldNavHost(navController = navController)
+                        DexFoldNavHost(
+                            navController = navController,
+                            windowState = windowState  // 👈 pasamos el estado
+                        )
                     }
                 }
             }

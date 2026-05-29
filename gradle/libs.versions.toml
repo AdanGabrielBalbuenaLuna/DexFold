@@ -34,6 +34,11 @@ windowManager           = "1.2.0"
 # --- Coroutines ---
 coroutines              = "1.7.3"
 
+# --- Material ---
+material3WindowSizeClass = "1.4.0"
+
+# --- Material Icons ---
+materialIcons = "1.7.8"
 
 [libraries]
 # --- Core ---
@@ -84,6 +89,14 @@ junit                               = { group = "junit",               name = "j
 androidx-junit                      = { group = "androidx.test.ext",   name = "junit",                      version.ref = "junitVersion" }
 androidx-espresso-core              = { group = "androidx.test.espresso", name = "espresso-core",           version.ref = "espressoCore" }
 
+# WindowSizeClass
+androidx-material3-window-size = { group = "androidx.compose.material3", name = "material3-window-size-class", version.ref = "material3WindowSizeClass" }
+
+# Icons
+androidx-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core", version.ref = "materialIcons" }
+
+# Icons Extended (si necesitas más íconos además de los básicos)
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIcons" }
 
 [bundles]
 retrofit                = ["retrofit", "retrofit-gson", "okhttp-logging"]
