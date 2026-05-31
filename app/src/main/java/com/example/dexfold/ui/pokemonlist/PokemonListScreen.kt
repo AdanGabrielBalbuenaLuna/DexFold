@@ -1,5 +1,7 @@
 package com.example.dexfold.ui.pokemonlist
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,8 +28,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.dexfold.core.util.PokemonTypeColors
 import com.example.dexfold.domain.model.Pokemon
 
 @Composable
@@ -103,6 +107,16 @@ fun PokemonCard(
     pokemon: Pokemon,
     onPokemonClick: (Int) -> Unit
 ) {
+    // 👇 Color de fondo basado en el tipo primario del pokémon
+    val backgroundColor by animateColorAsState(
+        targetValue = if (pokemon.types.isNotEmpty()) {
+            PokemonTypeColors.getBackgroundColor(pokemon.types.first())
+        } else {
+            MaterialTheme.colorScheme.surface
+        },
+        animationSpec = tween(durationMillis = 500),
+        label = "cardBackgroundColor"
+    )
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -110,6 +124,10 @@ fun PokemonCard(
             // 👇 clickable hace que la card sea tappable
             .clickable { onPokemonClick(pokemon.id) },
         elevation = CardDefaults.cardElevation(4.dp)
+        ,// 👇 Color dinámico en la card
+        colors = CardDefaults.cardColors(
+            containerColor = backgroundColor
+        )
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -152,14 +170,23 @@ fun PokemonCard(
 // 👇 Chip para cada tipo de pokémon
 @Composable
 fun TypeChip(type: String) {
+    // 👇 Color animado — si el tipo cambia, el color transiciona suavemente
+    val chipColor by animateColorAsState(
+        targetValue = PokemonTypeColors.getColor(type),
+        animationSpec = tween(durationMillis = 300),
+        label = "typeChipColor"
+    )
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.primaryContainer
+        // 👇 Ahora usa el color del tipo en lugar del color genérico
+        color = chipColor
     ) {
         Text(
-            text = type,
+            text = type.replaceFirstChar { it.uppercase() },
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            style = MaterialTheme.typography.labelSmall
+            style = MaterialTheme.typography.labelSmall,
+            // 👇 Texto blanco para contraste con el color del tipo
+            color = Color.White
         )
     }
 }

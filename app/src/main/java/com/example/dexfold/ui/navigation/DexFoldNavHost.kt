@@ -1,5 +1,8 @@
 package com.example.dexfold.ui.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,7 +74,23 @@ fun DexFoldNavHost(
         // 👇 Kotlin permite omitir el nombre del parámetro
         // cuando es el único o el primero
         // es igual a: composable(route = Routes.POKEMON_LIST)
-        composable(Routes.POKEMON_LIST) {
+        composable(
+            route = Routes.POKEMON_LIST,
+            // 👇 Cuando List entra (regresando del detalle)
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { -it },
+                    animationSpec = tween(300)
+                )
+            },
+            // 👇 Cuando List sale (yendo al detalle)
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -it },
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
             // 👇 Aquí están los delegates que prometí
             // Hilt crea el ViewModel automáticamente
             val pokemonListViewModel = hiltViewModel<PokemonListViewModel>()
@@ -88,7 +107,21 @@ fun DexFoldNavHost(
             route = Routes.POKEMON_DETAIL,
             arguments = listOf(
                 navArgument("pokemonId") { type = NavType.IntType }
-            )
+            ),
+            // 👇 Cuando Detail entra (viniendo de la lista)
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(300)
+                )
+            },
+            // 👇 Cuando Detail sale (regresando a la lista)
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = tween(300)
+                )
+            }
         ) { backStackEntry ->
             val pokemonId = backStackEntry.arguments?.getInt("pokemonId") ?: return@composable
             // 👇 Hilt crea el ViewModel automáticamente
