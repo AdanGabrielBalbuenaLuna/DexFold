@@ -1,4 +1,4 @@
-package com.example.dexfold.ui.theme
+package com.gabrielbalbuenadev.dexfold.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

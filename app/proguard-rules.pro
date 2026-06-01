@@ -19,3 +19,30 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# ---- DexFold Rules ----
+
+# Retrofit
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class retrofit2.** { *; }
+-keepclassmembernames interface * {
+    @retrofit2.http.* <methods>;
+}
+
+# Gson
+-keep class com.google.gson.** { *; }
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+
+# DTOs
+-keep class com.gabrielbalbuenadev.dexfold.data.remote.dto.** { *; }
+
+# Room
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+
+# Hilt
+-keep class dagger.hilt.** { *; }
+-keep class javax.inject.** { *; }

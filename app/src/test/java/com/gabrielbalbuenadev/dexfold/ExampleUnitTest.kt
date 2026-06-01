@@ -1,4 +1,4 @@
-package com.example.dexfold
+package com.gabrielbalbuenadev.dexfold
 
 import org.junit.Test
 

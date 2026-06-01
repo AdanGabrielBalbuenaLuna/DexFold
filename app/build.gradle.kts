@@ -2,25 +2,28 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
-    namespace = "com.example.dexfold"
+    namespace = "com.gabrielbalbuenadev.dexfold"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.dexfold"
+        applicationId = "com.gabrielbalbuenadev.dexfold"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // 👇 Activa la minificación y optimización
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -41,14 +44,39 @@ android {
 
 dependencies {
 
+// Core
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // Compose BOM — controla versiones de todas las libs de Compose
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    implementation(libs.bundles.compose.ui)
+
+    // Navigation
+    implementation(libs.navigation.compose)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+    ksp(libs.hilt.compiler)
+
+    // Datos
+    implementation(libs.bundles.retrofit)
+    implementation(libs.bundles.room)
+    ksp(libs.room.compiler)
+
+    // Imágenes
+    implementation(libs.coil.compose)
+
+    // Foldables
+    implementation(libs.window.manager)
+
+    // Coroutines
+    implementation(libs.coroutines.android)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -56,4 +84,12 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Material
+    implementation(libs.androidx.material3.window.size)
+
+    // Icons
+    implementation(libs.androidx.material.icons.core)
+    // opcional si necesitas más íconos:
+    implementation(libs.androidx.material.icons.extended)
 }
