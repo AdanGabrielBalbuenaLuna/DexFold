@@ -1,7 +1,10 @@
 package com.gabrielbalbuenadev.dexfold.ui.pokemonlist
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -24,8 +28,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.gabrielbalbuenadev.dexfold.core.util.PokemonTypeColors
 import com.gabrielbalbuenadev.dexfold.domain.model.Pokemon
+import kotlinx.coroutines.delay
 
 @Composable
 fun PokemonListScreen(
@@ -87,16 +96,54 @@ fun PokemonList(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp)
     ) {
-        items(
+        // 👇 itemsIndexed en lugar de items
+        // necesitamos el index para el delay escalonado
+        itemsIndexed(
             items = pokemonList,
             // 👇 key mejora el rendimiento de LazyColumn
             // le dice a Compose cómo identificar cada elemento
-            key = { pokemon -> pokemon.id }
-        ) { pokemon ->
+            // 👇 _ ignora el index aquí
+            // pokemon.id es suficiente como identificador único
+            key = { _, pokemon -> pokemon.id }
+        ) { index, pokemon ->
+
+            // 👇 Estado propio de cada item
+            // 👇 Si el index es mayor a 8
+            // el item empieza VISIBLE directamente
+            // sin pasar por la animación
+            var isItemVisible by remember { mutableStateOf(index >= 8) }
+            //                ^^^^^^^^^^^^^
+            // index < 8  → empieza en false → se anima
+            // index >= 8 → empieza en true  → visible instantáneo
+
+            // 👇 Una coroutine por cada pokemon
+            // se lanza cuando el item aparece en pantalla
+            LaunchedEffect(pokemon.id) {
+                // 👇 Solo los primeros 8 items se animan
+                // el resto aparece instantáneo
+                val delayTime = if (index < 8) index * 50L else 0L
+                // 👇 Delay escalonado según posición
+                delay(delayTime)
+                // 👇 Ahora sí es visible
+                isItemVisible = true
+            }
+
+            // 👇 Anima la aparición del item
+            AnimatedVisibility(
+                visible = isItemVisible,
+                enter = fadeIn(
+                    animationSpec = tween(durationMillis = 300)
+                ) + slideInVertically(
+                    // 👇 Entra desde la mitad de su altura
+                    initialOffsetY = { it / 2 },
+                    animationSpec = tween(durationMillis = 300)
+                )
+            ) {
             PokemonCard(
                 pokemon = pokemon,
                 onPokemonClick = onPokemonClick
             )
+            }
         }
     }
 }
