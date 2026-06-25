@@ -20,7 +20,6 @@ import com.gabrielbalbuenadev.dexfold.ui.pokemonlist.PokemonListViewModel
 import androidx.hilt.navigation.compose.hiltViewModel // <--- Add this import
 import com.gabrielbalbuenadev.dexfold.core.util.WindowState
 import com.gabrielbalbuenadev.dexfold.ui.main.EmptyDetailPane
-import com.gabrielbalbuenadev.dexfold.ui.main.HalfOpenLayout
 import com.gabrielbalbuenadev.dexfold.ui.main.TwoPaneLayout
 
 @Composable
@@ -33,11 +32,9 @@ fun DexFoldNavHost(
 
     // 👇 ¿Estamos en modo dos paneles?
     val isTwoPane = windowState is WindowState.Expanded
-    val isHalfOpen = windowState is WindowState.HalfOpened  // 👈 nuevo estado HALFOPENED
 
-    when {
+    if (isTwoPane) {
         // 👇 Modo desplegado — dos paneles simultáneos
-        isTwoPane -> {
         val listViewModel = hiltViewModel<PokemonListViewModel>()
         val detailViewModel = hiltViewModel<PokemonDetailViewModel>()
 
@@ -68,39 +65,7 @@ fun DexFoldNavHost(
                 }
             }
         )
-    }
-
-        // 👇 Modo Half-Open — dos paneles arriba/abajo
-        isHalfOpen -> {
-            val listViewModel = hiltViewModel<PokemonListViewModel>()
-            val detailViewModel = hiltViewModel<PokemonDetailViewModel>()
-
-            HalfOpenLayout(
-                listContent = {
-                    PokemonListScreen(
-                        viewModel = listViewModel,
-                        onPokemonClick = { pokemonId ->
-                            // 👇 igual que TwoPane
-                            // actualizamos el panel inferior
-                            selectedPokemonId = pokemonId
-                        }
-                    )
-                },
-                detailContent = {
-                    if (selectedPokemonId != null) {
-                        PokemonDetailScreen(
-                            pokemonId = selectedPokemonId!!,
-                            viewModel = detailViewModel,
-                            onBackClick = { selectedPokemonId = null }
-                        )
-                    } else {
-                        EmptyDetailPane()
-                    }
-                }
-            )
-        }
-
-    else -> {
+    } else {
         // 👇 Modo plegado — navegación normal
     NavHost(
         navController = navController,
@@ -168,6 +133,5 @@ fun DexFoldNavHost(
             )
         }
     }
-    }
-} // End When
+}
 }
