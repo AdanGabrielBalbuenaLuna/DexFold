@@ -2,7 +2,6 @@ package com.gabrielbalbuenadev.dexfold.domain.usecase
 
 import com.gabrielbalbuenadev.dexfold.domain.model.Pokemon
 import com.gabrielbalbuenadev.dexfold.domain.repository.PokemonRepository
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 // 👇 Recibe el Repository por constructor
@@ -11,11 +10,13 @@ import javax.inject.Inject
 class GetPokemonListUseCase @Inject constructor(
     private val repository: PokemonRepository
 ) {
-    // 👇 Ya no es suspend, Flow no necesita serlo
-    operator fun invoke(
+    // 👇 operator fun invoke permite llamar el UseCase como función
+    // en lugar de getPokemonListUseCase.execute()
+    // puedes hacer getPokemonListUseCase()
+    suspend operator fun invoke(
         limit: Int = 20,
         offset: Int = 0
-    ): Flow<List<Pokemon>> {
+    ): Result<List<Pokemon>> {
         return repository.getPokemonList(limit, offset)
     }
 }

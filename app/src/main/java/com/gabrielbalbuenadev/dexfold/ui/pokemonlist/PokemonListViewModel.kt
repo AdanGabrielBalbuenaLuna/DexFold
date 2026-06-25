@@ -7,7 +7,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,25 +36,24 @@ class PokemonListViewModel @Inject constructor(
             // 👇 Paso 1 — Avisamos que estamos cargando
             _uiState.value = PokemonListUiState.Loading
 
-            // 👇 Antes: val result = getPokemonListUseCase()
-            // Ahora: collect() recibe múltiples emisiones
-            getPokemonListUseCase()
-                .catch { e ->
-                    // 👇 Si el Flow falla, mostramos error
-                    _uiState.value = PokemonListUiState.Error(
-                        e.message ?: "Error desconocido"
-                    )
-                }
-                .collect { pokemon ->
-                    // 👇 Se llama DOS veces:
-                    // 1. con datos locales (inmediato)
-                    // 2. con datos frescos (después de API)
-                    _uiState.value = if (pokemon.isEmpty()) {
-                        PokemonListUiState.Loading
-                    } else {
-                        PokemonListUiState.Success(pokemon)
-                    }
-                }
+            // 👇 Paso 2 — Llamamos el UseCase (suspend function)
+            val result = getPokemonListUseCase()
+
+            // 👇 Paso 3 — Aquí ocurre la conversión Result → UiState
+            // que mencionamos antes 🎯
+            _uiState.value = when {
+                result.isSuccess -> PokemonListUiState.Success(
+                    // 👇 getOrNull() extrae los datos del Result
+                    pokemon = result.getOrNull() ?: emptyList()
+                )
+                result.isFailure -> PokemonListUiState.Error(
+                    // 👇 message extrae el mensaje del error
+                    message = result.exceptionOrNull()?.message ?: "Error desconocido"
+                )
+                // 👇 Kotlin necesita un else aunque Result
+                // solo tiene dos estados
+                else -> PokemonListUiState.Error("Error desconocido")
+            }
         }
     }
 }

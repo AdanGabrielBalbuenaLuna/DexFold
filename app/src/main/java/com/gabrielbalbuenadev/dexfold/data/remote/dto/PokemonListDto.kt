@@ -1,20 +1,22 @@
 package com.gabrielbalbuenadev.dexfold.data.remote.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class PokemonListDto(
     // 👇 Total de pokémon en la API
-    val count: Int,
+    @SerializedName("count") val count: Int,
 
     // 👇 URL para la siguiente página (null si es la última)
-    val next: String?,
+    @SerializedName("next") val next: String?,
 
     // 👇 Lista con nombre y url de cada pokémon
-    val results: List<PokemonResultDto>
+    @SerializedName("results") val results: List<PokemonResultDto>
 )
 
 data class PokemonResultDto(
-    val name: String,
+    @SerializedName("name") val name: String,
 
     // 👇 "https://pokeapi.co/api/v2/pokemon/1/"
     // De esta URL extraeremos el ID del pokémon
-    val url: String
+    @SerializedName("url") val url: String
 )
